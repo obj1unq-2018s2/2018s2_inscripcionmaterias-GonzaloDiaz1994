@@ -1,0 +1,140 @@
+import example.*
+
+describe "tests"{
+	
+	var unqui = new Universidad()
+
+	var programacion= new Carrera(
+		materias=[]
+	)
+	
+	var gonzalo =  new Estudiante(
+		notasMaterias = [],
+		carreras = [programacion],
+		materiasAprobadas = [],
+		creditosAcumulados = 100,
+		materiasInscripto = [],
+		materiasEnListaEspera = []
+	)
+	
+	var lengua = new Materia(
+		inscriptos = [],
+		creditos = 10,
+		anio = 2,
+		cupo = 10,
+		listaDeEspera = [],
+		carrera = programacion
+	)
+	
+	var intro= new MateriaConCorrelativas(
+		correlativas=[lengua],
+		inscriptos=[],
+		creditos = 10,
+		anio=1,
+		cupo= 10,
+		listaDeEspera=[],
+		carrera = programacion
+	)
+
+	var matematica= new MateriaConCreditos(
+		creditosNecesarios= 100,
+		inscriptos=[],
+		creditos = 10,
+		anio=1,
+		cupo= 20,
+		listaDeEspera=[],
+		carrera = programacion
+	)
+	
+	var objetos1 = new MateriaPorAnio(
+		inscriptos=[],
+		creditos = 10,
+		anio=2,
+		cupo= 30,
+		listaDeEspera=[],
+		carrera = programacion
+	)
+	
+	var aproboLenguaCon9 = new MateriaAprobada(
+		nota= 9,
+		materia= lengua
+	)
+	
+
+	
+	fixture {
+		programacion.materias().add(lengua)
+		programacion.materias().add(intro)
+		programacion.materias().add(objetos1)
+	}
+	
+	//1
+	test "alumno puede cursar materia que no pide nada"{
+		assert.that( unqui.puedeCursar(gonzalo,lengua) )
+	}
+	
+	test "estudiante puede cursar  materia que pide correlativa"{
+		gonzalo.materiasAprobadas().add(lengua)
+		assert.that( unqui.puedeCursar(gonzalo,intro) )
+	}
+	
+	test "estudiante puede cursar materia que pide creditos"{
+		assert.that( unqui.puedeCursar(gonzalo,matematica) )
+	}
+	
+	test "estudiante puede cursar materia que piede todas las de años anteriores"{
+		gonzalo.materiasAprobadas().add(lengua)
+		gonzalo.materiasAprobadas().add(intro)
+		assert.that( unqui.puedeCursar(gonzalo,objetos1) )
+	}
+	
+	test "estudiante aprobo materia"{
+		unqui.registrarMateriaAprobada(gonzalo,aproboLenguaCon9)
+		assert.equals([lengua], gonzalo.materiasAprobadas())
+		assert.equals(110, gonzalo.creditosAcumulados())
+	}
+
+	test "estudiante puede inscribirse"{
+		assert.that( unqui.estudiantePuedeInscribirse(gonzalo,lengua) )
+		unqui.inscribirEstudiante(gonzalo,lengua)
+		assert.equals( [gonzalo], lengua.inscriptos() )
+	}
+	
+	test "sacar  Estudiante"{
+		unqui.darDeBaja(gonzalo,lengua)
+		assert.equals([], lengua.inscriptos())
+	}
+
+	test "materias en las que se puede inscribir"{
+		assert.equals([lengua], unqui.materiasQueSePuedeInscribir(gonzalo,programacion))
+	}
+	
+	test "esta inscripto en "{
+		unqui.inscribirEstudiante(gonzalo,lengua)
+		assert.equals([lengua], unqui.materiasQueEstaInscripto(gonzalo) )
+	}
+	
+	test "esta en lista de espera"{
+		lengua.cupo(0) 
+		unqui.inscribirEstudiante(gonzalo,lengua)
+		assert.equals([gonzalo], lengua.listaDeEspera())
+		assert.equals( [lengua], gonzalo.materiasEnListaEspera() )
+	}
+	
+	//7
+	test "estudiante ya curso esta materia "{
+		unqui.registrarMateriaAprobada(gonzalo,aproboLenguaCon9)
+		assert.that(not unqui.puedeCursar(gonzalo,lengua) )
+	}
+	
+	test "rechazar estudiante"{
+		assert.that(not unqui.puedeCursar(gonzalo,intro) )
+	}
+	
+	test "estudiante va derecho a lista de espera"{
+		lengua.cupo(0) 
+		unqui.inscribirEstudiante(gonzalo,lengua)
+		assert.equals([gonzalo], lengua.listaDeEspera())
+	}
+}
+
