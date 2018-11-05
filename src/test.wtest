@@ -5,6 +5,8 @@ describe "tests"{
 	var unqui = new Universidad()
 
 	var programacion= new Carrera(
+		// TODO Usá los valores por defecto de los atributos para simplificar la instanciación de objetos.
+		// En especial cuando son colecciones vacías.
 		materias=[]
 	)
 	
@@ -12,7 +14,7 @@ describe "tests"{
 		notasMaterias = [],
 		carreras = [programacion],
 		materiasAprobadas = [],
-		creditosAcumulados = 100,
+		creditosAcumulados = 100, // TODO Estás creando un objeto inconsistente, tu modelo debería evitar eso.
 		materiasInscripto = [],
 		materiasEnListaEspera = []
 	)
